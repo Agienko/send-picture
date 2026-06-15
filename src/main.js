@@ -7,6 +7,9 @@ import {Brush} from "./components/brush.js";
 import {SandFactory} from "./components/sand-factory.js";
 import {init, settings} from "./settings.js";
 import {hideLoader, showLoader} from "./loader-controller/loader-controller.js";
+import {Fullscreen} from "./fullscreen.js";
+
+new Fullscreen();
 
 showLoader();
 export const stats = new Stats();
