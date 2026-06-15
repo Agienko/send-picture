@@ -19,6 +19,7 @@ document.body.appendChild(stats.dom);
 
 document.body.style.backgroundColor = settings.bgColor;
 
+
 export const app = new App();
 
 (async () => {
