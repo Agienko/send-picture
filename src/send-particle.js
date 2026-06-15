@@ -12,8 +12,6 @@ export class SendParticle extends Particle{
             alpha: 0,
         });
 
-        this.stage = stage;
-
         this.speed = randomFloat(0.5, 1.5);
         this.angle = Math.random() * PI2;
 
@@ -70,7 +68,7 @@ export class SendParticle extends Particle{
 
 
 
-        this.alpha = (1 - (now - this.at) / settings.lifeTime) * brightness;
+        this.alpha = (1 - (now - this.at) / settings.lifeTime) * (brightness - 0.1);
 
         if(this.alpha < 0.2){
             this.alpha = 0
@@ -79,14 +77,7 @@ export class SendParticle extends Particle{
         const s = 0.5 + brightness * 0.5;
         this.scaleX = s;
         this.scaleY = s;
+
+
     }
-
-    destroy(){
-        this.alpha = 0;
-        this.texture = null;
-
-        this.stage.removeParticle(this);
-        this.stage = null;
-    }
-
 }

@@ -1,11 +1,11 @@
 import './style.css'
+import Stats from 'stats.js';
 import {Application, Ticker} from 'pixi.js';
 import {ReferenceSprite} from "./reference-sprite.js";
 import {Brush} from "./brush.js";
+import {ParticleCreator} from "./particle-creator.js";
 import {loadSavedTexture, settings} from "./settings.js";
 import {hideLoader, showLoader} from "./loader.js";
-import {ParticleCreator} from "./particle-creator.js";
-import Stats from 'stats.js';
 
 export const stats = new Stats();
 stats.showPanel(0); // 0: FPS, 1: MS, 2: MB
@@ -53,7 +53,6 @@ showLoader();
         const delta = ticker.elapsedMS / 16.6667;
         for (let i = 0; i < particleCreator.particles.length; i++) {
             const p = particleCreator.getParticle(i);
-
             if(p.alpha <= 0) continue;
 
             const darkness = referenceSprite.getBrightnessAt(p.x, p.y);

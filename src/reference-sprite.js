@@ -1,11 +1,10 @@
-import {Assets, ColorMatrixFilter, RenderTexture, Sprite, Texture} from "pixi.js";
+import {ColorMatrixFilter, RenderTexture, Sprite, Texture} from "pixi.js";
 import {app} from "./main.js";
 
 export class ReferenceSprite {
     constructor() {
         this.referenceSprite = new Sprite(Texture.EMPTY);
         this.referenceSprite.anchor.set(0.5);
-        // app.stage.addChild(this.referenceSprite);
 
         this.extracted = null;
         this.brightnessCache = null;

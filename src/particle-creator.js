@@ -15,25 +15,36 @@ export class ParticleCreator extends ParticleContainer {
                 color: true     // Static colors
             }
         })
-        app.stage.addChild(this);
+
+        this.batchId = 0;
+        this.batchRequestId = -1
 
         this.eventMode = 'none';
         this.interactiveChildren = false;
+        app.stage.addChild(this);
 
         this.particles = Array.from({length: settings.particleCount}, () => new SendParticle(this));
 
 
-        window.addEventListener('particleCountChanged', (e) => {
-            showLoader()
-            const newCount = e.detail;
-            while (this.particles.length > newCount) this.particles.pop().destroy();
-            while (this.particles.length < newCount) this.particles.push(new SendParticle(this));
-            hideLoader()
-        })
+        window.addEventListener('particleCountChanged', e => this.onParticleCountChanged(e))
 
         window.addEventListener('colorChanged', (e) => {
             this.particles.forEach(p => p.tint = e.detail.color);
         })
+    }
+
+    onParticleCountChanged(e){
+        const targetCount = e.detail;
+        const diff = targetCount - this.particles.length;
+
+        if (diff > 0) {
+            for (let i = 0; i < diff; i++) this.particles.push(new SendParticle(this));
+        } else if (diff < 0) {
+
+            this.particles.length = targetCount;
+            this.removeParticles(targetCount);
+        }
+
     }
 
     getParticle(i){

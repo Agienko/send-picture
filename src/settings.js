@@ -100,11 +100,12 @@ gui.add(settings, 'stats', 0, 1, 1).onChange((value) => {
 
 gui.add(settings, 'renderer', ['webgl', 'webgpu']).name('renderer').onChange((value) => location.reload());
 
+Ticker.shared.maxFPS = settings.maxFPS;
 gui.add(settings, 'maxFPS', 24, 120, 1).name('max FPS').onChange((value) => Ticker.shared.maxFPS = +value);
 
 let debounceParticleAmountTimeout = -1;
 
-gui.add(settings, 'particleCount', 10000, 200000, 1).onChange(value => {
+gui.add(settings, 'particleCount', 10000, 500000, 1).onChange(value => {
     clearTimeout(debounceParticleAmountTimeout);
     debounceParticleAmountTimeout = setTimeout(() => {
         const event = new CustomEvent('particleCountChanged', {detail: value});
