@@ -103,5 +103,6 @@ const fileInput = createFileInput();
 window.addEventListener('textureLoaded', (event) => {
     textureController.updateDisplay();
     settings.textureName = event.detail.textureName;
+    closeGui();
 })
 gui.add(fileInput, 'click').name('Load Texture');
