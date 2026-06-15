@@ -1,5 +1,5 @@
 import GUI from "lil-gui";
-import {app, stats} from "./main.js";
+import {stats} from "./main.js";
 import {Assets, Texture, Ticker} from "pixi.js";
 import {loadTextureFile, saveTextureFile} from './db.js'
 
@@ -40,7 +40,7 @@ export const settings = {
     ...loadSettings(),
     resetToDefault: () => {
         Object.assign(settings, defaultSettings);
-        loadSavedTexture();
+        void loadSavedTexture();
         stats.domElement.style.display = 'none';
         gui.controllersRecursive().forEach(controller => controller.updateDisplay());
     }
@@ -100,9 +100,7 @@ gui.add(settings, 'stats', 0, 1, 1).onChange((value) => {
 
 gui.add(settings, 'renderer', ['webgl', 'webgpu']).name('renderer').onChange((value) => location.reload());
 
-gui.add(settings, 'maxFPS', 24, 120, 1).name('max FPS').onChange((value) => {
-    Ticker.shared.maxFPS = +value;
-});
+gui.add(settings, 'maxFPS', 24, 120, 1).name('max FPS').onChange((value) => Ticker.shared.maxFPS = +value);
 
 let debounceParticleAmountTimeout = -1;
 
@@ -123,6 +121,19 @@ gui.addColor(settings, 'color').onChange((value) => {
     }, 250)
 
 });
+
+let debounceBgColorTimeout = -1;
+gui.addColor(settings, 'bgColor').onChange((value) => {
+    clearTimeout(debounceBgColorTimeout);
+    debounceBgColorTimeout = setTimeout(() => {
+        const event = new CustomEvent('bgColorChanged', {detail: {color: value}});
+        window.dispatchEvent(event);
+    }, 250)
+
+});
+
+
+
 gui.add(settings, 'resetToDefault').name('Reset to default');
 
 const textureController = gui.add(settings, 'textureName').name('Texture').disable();
@@ -159,7 +170,6 @@ fileInput.addEventListener('change', async (event) => {
 });
 
 gui.add(fileInput, 'click').name('Load Texture');
-
 
 const save = () => {
     try {

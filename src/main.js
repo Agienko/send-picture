@@ -26,6 +26,12 @@ showLoader();
         backgroundColor: settings.bgColor
     });
 
+    window.addEventListener('bgColorChanged', (e) => {
+        const color = e.detail.color;
+        document.body.style.backgroundColor = settings.bgColor;
+        app.renderer.background.color = color;
+    })
+
     app.stage.eventMode = 'static';
     app.stage.interactiveChildren = false;
     document.body.appendChild(app.canvas);
