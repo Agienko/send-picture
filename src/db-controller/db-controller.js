@@ -2,7 +2,7 @@ const DB_NAME = 'send-particles-texture-db';
 const STORE_NAME = 'send-particles-textures';
 const TEXTURE_KEY = 'send-particles-user-texture';
 
-function openDB() {
+const openDB = () => {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open(DB_NAME, 1);
 
@@ -12,7 +12,7 @@ function openDB() {
     });
 }
 
-export function saveTextureFile(file) {
+export const saveTextureFile = file => {
     return new Promise((resolve, reject) => {
         openDB().then(db => {
             const tx = db.transaction(STORE_NAME, 'readwrite');
@@ -31,7 +31,7 @@ export function saveTextureFile(file) {
     });
 }
 
-export function loadTextureFile() {
+export const loadTextureFile = () => {
     return new Promise((resolve, reject) => {
         openDB().then(db => {
             const tx = db.transaction(STORE_NAME, 'readonly');

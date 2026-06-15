@@ -1,7 +1,7 @@
 import {Rectangle} from "pixi.js";
-import {PI2, randomFloat} from "./helpers.js";
-import {closeGui, settings} from "./settings.js";
-import {app} from "./main.js";
+import {PI2, randomFloat} from "../helpers.js";
+import {closeGui, settings} from "../settings.js";
+import {app} from "../main.js";
 
 export class Brush {
     constructor(particles) {
@@ -42,7 +42,7 @@ export class Brush {
 
         const update = () => {
 
-            const rad = this.brushRadius*settings.brashRadiusScale;
+            const rad = this.brushRadius * settings.brashRadiusScale;
             for (let i = 0; i < settings.brashIterations; i++) {
 
                 this.particleI = (this.particleI + 1) % this.particles.length;

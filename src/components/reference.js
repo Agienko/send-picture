@@ -1,7 +1,8 @@
 import {ColorMatrixFilter, RenderTexture, Sprite, Texture} from "pixi.js";
-import {app} from "./main.js";
+import {app} from "../main.js";
+import {settings} from "../settings.js";
 
-export class ReferenceSprite {
+export class Reference {
     constructor() {
         this.referenceSprite = new Sprite(Texture.EMPTY);
         this.referenceSprite.anchor.set(0.5);
@@ -10,7 +11,7 @@ export class ReferenceSprite {
         this.brightnessCache = null;
 
         window.addEventListener('textureLoaded', (e) => {
-            this.referenceSprite.texture = e.detail;
+            this.referenceSprite.texture = e.detail.texture;
             this.#onResize();
         });
 
@@ -29,9 +30,18 @@ export class ReferenceSprite {
             resolution: 1
         });
 
+
+        app.renderer.render({
+            container: new Sprite(Texture.WHITE),
+            target: renderTexture,
+            clear: true,
+            clearColor: [1, 1, 1, 1]
+        });
+
         app.renderer.render({
             container: this.referenceSprite,
-            target: renderTexture
+            target: renderTexture,
+            clear: false
         });
 
         this.referenceSprite.filters = null;
@@ -41,13 +51,12 @@ export class ReferenceSprite {
 
         renderTexture.destroy(true);
         this.#cacheExtracted();
-
     }
     #cacheExtracted(){
         const {pixels, width, height} = this.extracted;
         this.brightnessCache = new Float32Array(width * height);
         for (let i = 0, j = 0; i < pixels.length; i += 4, j++) {
-            this.brightnessCache[j] = (pixels[i] + pixels[i + 1] + pixels[i + 2]) / 3 / 255;
+            this.brightnessCache[j] = (pixels[i] + pixels[i + 1] + pixels[i + 2]) / 765;
         }
     }
 
@@ -69,11 +78,19 @@ export class ReferenceSprite {
 
     getBrightnessAt(x, y) {
         if (!this.extracted) return 0;
+
         x = x | 0;
         y = y | 0;
 
         if (x < 0 || x >= this.extracted.width || y < 0 || y >= this.extracted.height) return 0;
 
         return this.brightnessCache[y * this.extracted.width + x] ?? 0;
+    }
+
+    getBrightnessParams(particle) {
+        const brightness = this.getBrightnessAt(particle.x, particle.y);
+        const gx = this.getBrightnessAt(particle.x + settings.step, particle.y) - this.getBrightnessAt(particle.x - settings.step, particle.y);
+        const gy = this.getBrightnessAt(particle.x, particle.y + settings.step) - this.getBrightnessAt(particle.x, particle.y - settings.step);
+        return {brightness, gx, gy};
     }
 }

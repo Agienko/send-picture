@@ -1,19 +1,11 @@
 import GUI from "lil-gui";
 import {stats} from "./main.js";
-import {Assets, Texture, Ticker} from "pixi.js";
-import {loadTextureFile, saveTextureFile} from './db.js'
-
-const STORAGE_KEY = '_send_particle_settings_';
+import {Ticker} from "pixi.js";
+import {loadTextureFile} from './db-controller/db-controller.js'
+import {loadSettings} from "./storage-controller/storage-controller.js";
+import {createFileInput, processFileToLoad} from "./helpers.js";
 
 const gui = new GUI({title: 'Particle Settings'});
-
-const loadSettings = () => {
-    try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY)) ?? {};
-    } catch (e) {
-        return {};
-    }
-};
 
 const defaultSettings = {
     wanderForce: 0.07,   // постійний хаотичний рух
@@ -40,48 +32,19 @@ export const settings = {
     ...loadSettings(),
     resetToDefault: () => {
         Object.assign(settings, defaultSettings);
-        void loadSavedTexture();
+        void init();
         stats.domElement.style.display = 'none';
         gui.controllersRecursive().forEach(controller => controller.updateDisplay());
     }
 }
 
-
-export async function loadSavedTexture() {
+export async function init() {
     const file = settings.textureName !== 'default' ? await loadTextureFile() : null;
-
-    if (!file) {
-        settings.textureName = 'default';
-        textureController.updateDisplay();
-        const texture = await Assets.load('/default.png');
-
-        const event = new CustomEvent('textureLoaded', {detail: texture});
-        window.dispatchEvent(event);
-        return;
-    }
-
-    const url = URL.createObjectURL(file);
-
-    const image = new Image();
-    image.onload = () => {
-        const texture = Texture.from(image);
-        URL.revokeObjectURL(url);
-        console.log('Texture loaded:', file.name, texture);
-        settings.textureName = file.name;
-        textureController.updateDisplay();
-        const event = new CustomEvent('textureLoaded', {detail: texture});
-        window.dispatchEvent(event);
-    };
-
-    image.onerror = (error) => {
-        URL.revokeObjectURL(url);
-        console.error('Texture error:', file.name);
-    };
-
-    image.src = url;
+    processFileToLoad(file);
 }
-
 export const closeGui = () => gui.close();
+
+closeGui()
 
 gui.add(settings, 'wanderForce', 0, 1, 0.001);
 gui.add(settings, 'textureForce', 0, 5, 0.001);
@@ -104,7 +67,6 @@ Ticker.shared.maxFPS = settings.maxFPS;
 gui.add(settings, 'maxFPS', 24, 120, 1).name('max FPS').onChange((value) => Ticker.shared.maxFPS = +value);
 
 let debounceParticleAmountTimeout = -1;
-
 gui.add(settings, 'particleCount', 10000, 500000, 1).onChange(value => {
     clearTimeout(debounceParticleAmountTimeout);
     debounceParticleAmountTimeout = setTimeout(() => {
@@ -133,56 +95,13 @@ gui.addColor(settings, 'bgColor').onChange((value) => {
 
 });
 
-
-
 gui.add(settings, 'resetToDefault').name('Reset to default');
 
 const textureController = gui.add(settings, 'textureName').name('Texture').disable();
 
-const fileInput = document.createElement('input');
-fileInput.type = 'file';
-fileInput.accept = 'image/*';
-
-fileInput.addEventListener('change', async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-    await saveTextureFile(file);
-    const url = URL.createObjectURL(file);
-
-    const image = new Image();
-
-    image.onload = () => {
-        const texture = Texture.from(image);
-        URL.revokeObjectURL(url);
-        console.log('Texture loaded:', file.name);
-        settings.textureName = file.name;
-        textureController.updateDisplay();
-        const event = new CustomEvent('textureLoaded', {detail: texture});
-        window.dispatchEvent(event);
-    };
-
-    image.onerror = (error) => {
-        URL.revokeObjectURL(url);
-        console.error('Texture error:', file.name);
-    };
-
-    image.src = url;
-
-});
-
-gui.add(fileInput, 'click').name('Load Texture');
-
-const save = () => {
-    try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-    } catch (e) {
-        console.error('Error saving settings:', e);
-    }
-};
-
-document.addEventListener('visibilitychange', (e) => {
-    if (document.visibilityState === 'visible') return;
-    save()
+const fileInput = createFileInput();
+window.addEventListener('textureLoaded', (event) => {
+    textureController.updateDisplay();
+    settings.textureName = event.detail.textureName;
 })
-
-document.addEventListener('beforeunload', save)
+gui.add(fileInput, 'click').name('Load Texture');

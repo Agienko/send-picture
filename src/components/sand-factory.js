@@ -1,10 +1,9 @@
 import {ParticleContainer} from "pixi.js";
-import {settings} from "./settings.js";
-import {SendParticle} from "./send-particle.js";
-import {hideLoader, showLoader} from "./loader.js";
-import {app} from "./main.js";
+import {settings} from "../settings.js";
+import {SandParticle} from "./sand-particle.js";
+import {app} from "../main.js";
 
-export class ParticleCreator extends ParticleContainer {
+export class SandFactory extends ParticleContainer {
     constructor(){
         super({
             dynamicProperties: {
@@ -16,15 +15,11 @@ export class ParticleCreator extends ParticleContainer {
             }
         })
 
-        this.batchId = 0;
-        this.batchRequestId = -1
-
         this.eventMode = 'none';
         this.interactiveChildren = false;
         app.stage.addChild(this);
 
-        this.particles = Array.from({length: settings.particleCount}, () => new SendParticle(this));
-
+        this.particles = Array.from({length: settings.particleCount}, () => new SandParticle(this));
 
         window.addEventListener('particleCountChanged', e => this.onParticleCountChanged(e))
 
@@ -38,7 +33,7 @@ export class ParticleCreator extends ParticleContainer {
         const diff = targetCount - this.particles.length;
 
         if (diff > 0) {
-            for (let i = 0; i < diff; i++) this.particles.push(new SendParticle(this));
+            for (let i = 0; i < diff; i++) this.particles.push(new SandParticle(this));
         } else if (diff < 0) {
 
             this.particles.length = targetCount;

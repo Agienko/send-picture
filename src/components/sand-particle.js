@@ -1,10 +1,10 @@
 import {Particle, Texture} from "pixi.js";
-import {PI2, randomFloat} from "./helpers.js";
-import {settings} from "./settings.js";
-import {app} from "./main.js";
+import {PI2, randomFloat} from "../helpers.js";
+import {settings} from "../settings.js";
+import {app} from "../main.js";
 
 
-export class SendParticle extends Particle{
+export class SandParticle extends Particle{
     constructor(stage) {
         super({
             texture: Texture.WHITE,
@@ -26,7 +26,21 @@ export class SendParticle extends Particle{
 
     }
 
-    onTick(gx, gy, brightness, now, delta) {
+    onTick(params, now, delta) {
+
+        if (this.x < 0 || this.x > app.screen.width) {
+            this.alpha = 0;
+            return;
+        }
+        if (this.y < 0 || this.y > app.screen.height) {
+            this.alpha = 0;
+            return;
+        }
+        if(this.alpha < 0.2) {
+            this.alpha = 0;
+            return;
+        }
+
         this.directionTimer--;
 
         if (this.directionTimer <= 0) {
@@ -36,15 +50,13 @@ export class SendParticle extends Particle{
 
         if(this.directionTimer % 4 === 0){
             this.angle += Math.atan2(Math.sin(this.targetAngle - this.angle), Math.cos(this.targetAngle - this.angle)) * 0.035;
-
         }
 
         this.vx += Math.cos(this.angle) * settings.wanderForce;
         this.vy += Math.sin(this.angle) * settings.wanderForce;
 
-        this.vx += gx * settings.textureForce;
-        this.vy += gy * settings.textureForce;
-
+        this.vx += params.gx * settings.textureForce;
+        this.vy += params.gy * settings.textureForce;
 
         this.vx *= settings.friction;
         this.vy *= settings.friction;
@@ -59,25 +71,14 @@ export class SendParticle extends Particle{
             this.vy *= k;
         }
 
-        if (this.x < 0 || this.x > app.screen.width) this.vx *= -1;
+        this.x += this.vx * delta;
+        this.y += this.vy * delta;
 
-        if (this.y < 0 || this.y > app.screen.height) this.vy *= -1;
+        this.alpha = (1 - (now - this.at) / settings.lifeTime) * (params.brightness - 0.1);
 
-        this.x += this.vx*delta;
-        this.y += this.vy*delta;
-
-
-
-        this.alpha = (1 - (now - this.at) / settings.lifeTime) * (brightness - 0.1);
-
-        if(this.alpha < 0.2){
-            this.alpha = 0
-        }
-
-        const s = 0.5 + brightness * 0.5;
+        const s = 0.5 + params.brightness * 0.5;
         this.scaleX = s;
         this.scaleY = s;
-
 
     }
 }
