@@ -1,4 +1,4 @@
-import {settings} from "../settings.js";
+import {settings} from "../../settings.js";
 
 const STORAGE_KEY = '_send_particle_settings_';
 

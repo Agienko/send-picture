@@ -1,8 +1,8 @@
 import GUI from "lil-gui";
 import {stats} from "./main.js";
 import {Ticker} from "pixi.js";
-import {loadTextureFile} from './db-controller/db-controller.js'
-import {loadSettings} from "./storage-controller/storage-controller.js";
+import {loadTextureFile} from './controllers/db-controller/db-controller.js'
+import {loadSettings} from "./controllers/storage-controller/storage-controller.js";
 import {createFileInput, processFileToLoad} from "./helpers.js";
 
 const gui = new GUI({title: 'Particle Settings'});

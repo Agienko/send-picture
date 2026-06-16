@@ -1,5 +1,5 @@
 import {Assets, Texture} from "pixi.js";
-import {saveTextureFile} from "./db-controller/db-controller.js";
+import {saveTextureFile} from "./controllers/db-controller/db-controller.js";
 import {settings} from "./settings.js";
 
 export const randomFloat = (min, max) => Math.random() * (max - min) + min;
